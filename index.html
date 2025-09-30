@@ -15,7 +15,6 @@
 <body>
   <h2>🔎 Search SKU from URL</h2>
   <input type="text" id="urlBox" placeholder="Paste the URL here...">
-  <button onclick="extractAndSearch()">Search</button>
 
   <div id="results"></div>
 
@@ -27,7 +26,6 @@
       const response = await fetch('products.csv'); 
       const data = await response.text();
       const lines = data.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-      const headers = lines[0].split(",");
       products = lines.slice(1).map(line => {
         const values = line.split(",");
         return { 
@@ -46,7 +44,7 @@
     function extractAndSearch() {
       const url = document.getElementById("urlBox").value;
       if (!url.includes("=")) {
-        alert("⚠️ The URL must contain '=' to extract the value.");
+        document.getElementById('results').innerHTML = "<p style='color:red'>⚠️ URL must contain '='</p>";
         return;
       }
       const query = decodeURIComponent(url.split("=").pop()); 
@@ -67,6 +65,9 @@
       html += "</table>";
       document.getElementById('results').innerHTML = html;
     }
+
+    // تشغيل البحث أوتوماتيك لما المستخدم يكتب أو يغير في البوكس
+    document.getElementById("urlBox").addEventListener("input", extractAndSearch);
 
     loadCSV();
   </script>
