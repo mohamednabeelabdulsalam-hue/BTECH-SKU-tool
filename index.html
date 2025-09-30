@@ -3,35 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>SKU Search Tool</title>
-  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
-    h2 { color: #333; }
-    input {
-      width: 400px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    table {
-      border-collapse: collapse;
-      margin-top: 20px;
-      width: 100%;
-      background: #fff;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: left;
-    }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input { width: 80%; padding: 8px; margin-bottom: 10px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
     th { background-color: #f4f4f4; }
-    tr:hover { background: #f1f1f1; }
   </style>
 </head>
 <body>
-  <h2>🔎 Search Product</h2>
-  <input type="text" id="searchBox" placeholder="Type product description...">
+  <h2>🔎 Search SKU from URL</h2>
+  <input type="text" id="urlBox" placeholder="Paste the URL here...">
+  <button onclick="extractAndSearch()">Search</button>
+
   <div id="results"></div>
 
   <script>
@@ -58,6 +43,16 @@
       });
     }
 
+    function extractAndSearch() {
+      const url = document.getElementById("urlBox").value;
+      if (!url.includes("=")) {
+        alert("⚠️ The URL must contain '=' to extract the value.");
+        return;
+      }
+      const query = decodeURIComponent(url.split("=").pop()); 
+      searchProducts(query);
+    }
+
     function searchProducts(query) {
       if (!query) {
         document.getElementById('results').innerHTML = "";
@@ -72,10 +67,6 @@
       html += "</table>";
       document.getElementById('results').innerHTML = html;
     }
-
-    document.getElementById("searchBox").addEventListener("input", (e) => {
-      searchProducts(e.target.value);
-    });
 
     loadCSV();
   </script>
