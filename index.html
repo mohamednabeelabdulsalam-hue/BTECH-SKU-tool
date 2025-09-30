@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SKU Search Tool</title>
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h2 { color: #333; }
+    input {
+      width: 400px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 20px;
+      width: 100%;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+    th { background-color: #f4f4f4; }
+    tr:hover { background: #f1f1f1; }
+  </style>
+</head>
+<body>
+  <h2>🔎 Search Product</h2>
+  <input type="text" id="searchBox" placeholder="Type product description...">
+  <div id="results"></div>
+
+  <script>
+    let fuse;
+    let products = [];
+
+    async function loadCSV() {
+      const response = await fetch('products.csv'); 
+      const data = await response.text();
+      const lines = data.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      const headers = lines[0].split(",");
+      products = lines.slice(1).map(line => {
+        const values = line.split(",");
+        return { 
+          Description: values[0], 
+          SKU: values[1], 
+          Category: values[2] 
+        };
+      });
+
+      fuse = new Fuse(products, {
+        keys: ["Description"],
+        threshold: 0.3
+      });
+    }
+
+    function searchProducts(query) {
+      if (!query) {
+        document.getElementById('results').innerHTML = "";
+        return;
+      }
+
+      const results = fuse.search(query).slice(0, 20); 
+      let html = "<table><tr><th>SKU</th><th>Category</th></tr>";
+      results.forEach(r => {
+        html += `<tr><td>${r.item.SKU}</td><td>${r.item.Category}</td></tr>`;
+      });
+      html += "</table>";
+      document.getElementById('results').innerHTML = html;
+    }
+
+    document.getElementById("searchBox").addEventListener("input", (e) => {
+      searchProducts(e.target.value);
+    });
+
+    loadCSV();
+  </script>
+</body>
+</html>
